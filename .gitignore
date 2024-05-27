@@ -6,6 +6,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+venv/
+*.pyc
+__pycache__/
+instance/
+.pytest_cache/
+.env
+
 # C extensions
 *.so
 
