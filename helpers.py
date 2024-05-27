@@ -130,7 +130,7 @@ def chunks_csv_to_db(chunker):
     collection_name = "planning"
 
     vectorstore = PGVector(
-        embeddings=OpenAIEmbeddings(model="text-embedding-ada-002"),
+        embeddings=OpenAIEmbeddings(openai_api_key= os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002"),
         collection_name=collection_name,
         connection=connection,
         use_jsonb=True,
@@ -144,7 +144,7 @@ def search(search_term, top_k, filter=None):
     collection_name = "planning"
    
     vectorstore = PGVector(
-        embeddings=OpenAIEmbeddings(model="text-embedding-ada-002"),
+        embeddings=OpenAIEmbeddings(openai_api_key= os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002"),
         collection_name=collection_name,
         connection=connection,
         use_jsonb=True,
