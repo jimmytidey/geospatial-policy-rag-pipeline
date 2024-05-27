@@ -56,13 +56,11 @@ def api_rag():
     prompt = prompt.replace('\n', '<br/>')
     response = response.content.replace('\n', '<br/>')
     
-    html += "<h1> Response </h1>"
+    html = "<h1> Response </h1>"
     html += f"<p> {response} </p>"
     html += "<h2> Links </h2>"
     html += links    
 
-
-    html +="</div>"
     return html 
 
 @app.route('/pymupdf/')
