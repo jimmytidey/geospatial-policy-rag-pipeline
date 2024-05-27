@@ -21,6 +21,13 @@ http://127.0.0.1:5000/rag?topic=climate change (where topic parameter is of your
 
 ## Setting up the postgres DB
 
+make sure you set dimensionality of the embedding column
+ALTER TABLE langchain_pg_embedding
+DROP COLUMN embedding;
+
+ALTER TABLE langchain_pg_embedding
+ADD COLUMN embedding VECTOR(1536);
+
 # Making Llama Sherpa work
 
 https://stackoverflow.com/questions/51925384/unable-to-get-local-issuer-certificate-when-using-requests

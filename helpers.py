@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_postgres import PGVector
 from langchain_postgres.vectorstores import PGVector
+from langchain.vectorstores.pgvector import DistanceStrategy
 from langchain_openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import fitz  # PyMuPDF
@@ -147,6 +148,7 @@ def search(search_term, top_k, filter=None):
         embeddings=OpenAIEmbeddings(openai_api_key= os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002"),
         collection_name=collection_name,
         connection=connection,
+        distance_strategy = DistanceStrategy.COSINE,
         use_jsonb=True,
     )
     results = vectorstore.similarity_search(search_term, k=top_k, filter=filter)
