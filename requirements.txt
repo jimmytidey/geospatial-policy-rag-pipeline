@@ -60,6 +60,7 @@ psutil==5.9.8
 psycopg==3.1.19
 psycopg-binary==3.1.19
 psycopg-pool==3.2.2
+psycopg2-binary==2.9.9
 ptyprocess==0.7.0
 pure-eval==0.2.2
 pydantic==2.7.1
@@ -69,6 +70,7 @@ PyMuPDF==1.24.4
 PyMuPDFb==1.24.3
 PyPDF2==3.0.1
 python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
 pytz==2024.1
 PyYAML==6.0.1
 pyzmq==26.0.3

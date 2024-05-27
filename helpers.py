@@ -1,5 +1,6 @@
 import os,uuid,requests,glob
 import pandas as pd
+from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_postgres import PGVector
 from langchain_postgres.vectorstores import PGVector
@@ -14,6 +15,7 @@ from sherpa import (
     sherpa_coalesce_sections,
 )
 
+load_dotenv()
 
 def chunk_pdf(url, file_name, metadata):
    
@@ -138,8 +140,7 @@ def chunks_csv_to_db(chunker):
    
 
 def search(search_term, top_k, filter=None): 
-    DATABASE_URL = os.environ["DATABASE_URL"]
-    connection = DATABASE_URL
+    connection =  os.getenv("DATABASE_URL")
     collection_name = "planning"
    
     vectorstore = PGVector(

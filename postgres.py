@@ -1,4 +1,8 @@
 import psycopg2,os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 class Postgres:
 
     def __init__(self):
