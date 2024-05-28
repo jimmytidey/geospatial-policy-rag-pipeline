@@ -55,7 +55,7 @@ def rag_query(topic):
     print(f'Gemini query starts at {datetime.now()}')
     chat = ChatOpenAI(model_name="gpt-4", temperature=0.0)
     
-    genai.configure(api_key=os.getenv(["GOOGLE_API_KEY"]))
+    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
     model = genai.GenerativeModel("gemini-1.5-flash")
     response = model.generate_content(prompt)
   
