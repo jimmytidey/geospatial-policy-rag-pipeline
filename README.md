@@ -45,4 +45,24 @@ nltk.download('punkt')
 
 # Deploying
 
-Set heroku env variables
+Set heroku env variables from env file
+
+# Google API auth
+
+Steps to Set ADC on Heroku
+
+Service Account Key:
+
+Create a service account in your Google Cloud project.
+Download a JSON key file for this service account.
+Heroku Configuration:
+
+Open your Heroku app's dashboard.
+Navigate to "Settings" and then "Config Vars".
+Add the following config vars:
+GOOGLE_CREDENTIALS: Paste the entire contents of the JSON key file here.
+GOOGLE_APPLICATION_CREDENTIALS: Set this to /app/google-credentials.json.
+Profile Script:
+
+Create a file named .profile in the root directory of your project.
+Add this line to the file:
