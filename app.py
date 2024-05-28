@@ -31,15 +31,15 @@ def rag():
 
     [prompt, response, links] = rag_query(topic)
 
-    prompt = prompt.replace('\n', '<br/>')
-    response = response.replace('\n', '<br/>')
+    prompt = prompt.replace('<br/>', '')
+    response = response.replace('<br/>', '')
     
     html = "<div style=' width: 600px;'>"
-    html += "<h1> Response </h1>"
+    html += "<h1 class='govuk-heading-m'> Response </h1>"
     html += f"<p> {response} </p>"
-    html += "<h2> Links </h2>"
+    html += "<h2 class='govuk-heading-s'> Links </h2>"
     html += links    
-    html += "<h1> prompt </h1>"
+    html += "<h1 class='govuk-heading-m' > prompt </h1>"
     html += f"<p> {prompt} </p>"
 
     html +="</div>"
@@ -53,12 +53,13 @@ def api_rag():
 
     [prompt, response, links] = rag_query(topic)
 
-    prompt = prompt.replace('\n', '<br/>')
-    response = response.replace('\n', '<br/>')
+    prompt = prompt.replace('<br/>', '')
+    response = response.replace('<br/>', '')
+    print(response)
     
-    html = "<h1> Response </h1>"
+    html = "<h1 class='govuk-heading-m'> Response </h1>"
     html += f"<p> {response} </p>"
-    html += "<h2> Links </h2>"
+    html += "<h2 class='govuk-heading-m'> Links </h2>"
     html += links    
 
     return html 
