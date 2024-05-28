@@ -149,6 +149,6 @@ def search(search_term, top_k, filter=None):
         connection=connection,
         use_jsonb=True,
     )
-    results = vectorstore.similarity_search(search_term, k=top_k, filter=filter)
+    results = vectorstore.similarity_search_with_score(search_term, k=top_k, filter=filter)
     
     return results
