@@ -6,6 +6,7 @@ appnope==0.1.4
 asttokens==2.4.1
 attrs==23.2.0
 blinker==1.8.2
+cachetools==5.3.3
 certifi==2024.2.2
 charset-normalizer==3.3.2
 click==8.1.7
@@ -18,9 +19,19 @@ executing==2.0.1
 Flask==3.0.3
 Flask-Cors==4.0.1
 frozenlist==1.4.1
+google-ai-generativelanguage==0.6.4
+google-api-core==2.19.0
+google-api-python-client==2.131.0
+google-auth==2.29.0
+google-auth-httplib2==0.2.0
+google-generativeai==0.5.4
+googleapis-common-protos==1.63.0
+grpcio==1.64.0
+grpcio-status==1.62.2
 gunicorn==22.0.0
 h11==0.14.0
 httpcore==1.0.5
+httplib2==0.22.0
 httpx==0.27.0
 idna==3.7
 ipykernel==6.29.4
@@ -40,6 +51,7 @@ langchain-postgres==0.0.6
 langchain-text-splitters==0.2.0
 langsmith==0.1.63
 llmsherpa==0.1.4
+Markdown==3.6
 MarkupSafe==2.1.5
 marshmallow==3.21.2
 matplotlib-inline==0.1.7
@@ -56,6 +68,8 @@ pexpect==4.9.0
 pgvector==0.2.5
 platformdirs==4.2.2
 prompt-toolkit==3.0.43
+proto-plus==1.23.0
+protobuf==4.25.3
 psutil==5.9.8
 psycopg==3.1.19
 psycopg-binary==3.1.19
@@ -63,11 +77,14 @@ psycopg-pool==3.2.2
 psycopg2-binary==2.9.9
 ptyprocess==0.7.0
 pure-eval==0.2.2
+pyasn1==0.6.0
+pyasn1_modules==0.4.0
 pydantic==2.7.1
 pydantic_core==2.18.2
 Pygments==2.18.0
 PyMuPDF==1.24.4
 PyMuPDFb==1.24.3
+pyparsing==3.1.2
 PyPDF2==3.0.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
@@ -76,6 +93,7 @@ PyYAML==6.0.1
 pyzmq==26.0.3
 regex==2024.5.15
 requests==2.32.2
+rsa==4.9
 six==1.16.0
 sniffio==1.3.1
 SQLAlchemy==2.0.30
@@ -88,6 +106,7 @@ traitlets==5.14.3
 typing-inspect==0.9.0
 typing_extensions==4.12.0
 tzdata==2024.1
+uritemplate==4.1.1
 urllib3==2.2.1
 wcwidth==0.2.13
 Werkzeug==3.0.3

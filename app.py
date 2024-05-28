@@ -32,7 +32,7 @@ def rag():
     [prompt, response, links] = rag_query(topic)
 
     prompt = prompt.replace('\n', '<br/>')
-    response = response.content.replace('\n', '<br/>')
+    response = response.replace('\n', '<br/>')
     
     html = "<div style=' width: 600px;'>"
     html += "<h1> Response </h1>"
@@ -54,7 +54,7 @@ def api_rag():
     [prompt, response, links] = rag_query(topic)
 
     prompt = prompt.replace('\n', '<br/>')
-    response = response.content.replace('\n', '<br/>')
+    response = response.replace('\n', '<br/>')
     
     html = "<h1> Response </h1>"
     html += f"<p> {response} </p>"
