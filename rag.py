@@ -13,7 +13,7 @@ def rag_query(topic):
     print(f'Finish RAG retrival at {datetime.now()}')
 
     long_sentence_results = [
-        d for d in results if len(d[0].metadata.get("text", "").split()) >= 20
+        d for d in results if len(d[0].metadata.get("text", "").split()) >= 40
     ]
 
     relevant_long_sentence_results = [
@@ -30,9 +30,7 @@ def rag_query(topic):
     
     Please provide some ideas on what policies and approaches other communites have in relation to the topic of {topic}, using only information from the example policies.
 
-    Provide 5 ideas, pay attention to technical planning detials. 
-
-    Please summarise and sythesise these policies to make a bullet point list of ideas to recommend to the community.
+    Provide 5 ideas, pay attention to technical planning detials. Connect each idea to a specific policy or approach from the example policies.
     
     Please use only the information from the example policies to generate your response.
     
