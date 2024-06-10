@@ -13,11 +13,11 @@ def rag_query(topic):
     print(f'Finish RAG retrival at {datetime.now()}')
 
     long_sentence_results = [
-        d for d in results if len(d[0].metadata.get("text", "").split()) >= 40
+        d for d in results if len(d[0].metadata.get("text", "").split()) >= 30
     ]
 
     relevant_long_sentence_results = [
-        d for d in long_sentence_results if d[1] < 0.19
+        d for d in long_sentence_results if d[1] < 0.21
     ]
 
     if len(relevant_long_sentence_results) <5:
