@@ -43,6 +43,12 @@ ssl.\_create_default_https_context = \_create_unverified_https_context
 
 nltk.download('punkt')
 
+# Installing Llama Sherpa local server
+
+Download docker image: ghcr.io/nlmatics/nlm-ingestor:latest
+
+docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor
+
 # Deploying
 
 Set heroku env variables from env file

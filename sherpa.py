@@ -69,7 +69,7 @@ def sherpa_chunk_pdfs(metadata):
 def sherpa_chunk_pdf(file, metadata, last_page_number):
     print(f"splitting and embedding file: {file}")
     print()
-    llmsherpa_api_url = "https://readers.llmsherpa.com/api/document/developer/parseDocument?renderFormat=all"
+    llmsherpa_api_url = "http://localhost:5010/api/parseDocument?renderFormat=all"
     pdf_reader = LayoutPDFReader(llmsherpa_api_url)
     print(f"Sending {file} to API")
     try: 
