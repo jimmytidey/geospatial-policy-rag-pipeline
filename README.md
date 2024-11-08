@@ -16,9 +16,6 @@ http://127.0.0.1:5000/sherpa/
 To see the last chunked PDF, as chunked by PyMuPDF:
 http://127.0.0.1:5000/pymupdf/
 
-To interact with the RAG enpoint:
-http://127.0.0.1:5000/rag?topic=climate change (where topic parameter is of your choosing)
-
 ## Setting up the postgres DB
 
 make sure you set dimensionality of the embedding column
@@ -28,7 +25,7 @@ DROP COLUMN embedding;
 ALTER TABLE langchain_pg_embedding
 ADD COLUMN embedding VECTOR(1536);
 
-# Making Llama Sherpa work
+# Making Llama Sherpa work externally (no longer works I think)
 
 https://stackoverflow.com/questions/51925384/unable-to-get-local-issuer-certificate-when-using-requests
 Run Install Certificates.command in your MacOS finder (weird one... )
