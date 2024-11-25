@@ -4,7 +4,7 @@ from PyPDF2 import PdfReader, PdfWriter
 
 
 
-def split_pdf(file_name,  pages_per_split=400):
+def split_pdf(file_name, pages_per_split=400):
     
     temp_directory =  os.path.join("files", "temp")
     file_path = os.path.join("files", file_name)
@@ -24,11 +24,11 @@ def split_pdf(file_name,  pages_per_split=400):
             print(f"Failed to delete {pdf_file}. Reason: {e}")
 
     # Read the downloaded PDF
-    
     try:
         reader = PdfReader(file_path)
     except Exception as e:
         raise Exception(f"Failed to read the PDF file: {e}")
+    
 
     # Splitting the PDF
     total_pages = len(reader.pages)
@@ -42,9 +42,31 @@ def split_pdf(file_name,  pages_per_split=400):
             writer.add_page(reader.pages[page_number])
 
         # Save the split PDF
+        print(f"Saving pages {start_page+1} to {end_page} to a new PDF")
         output_filename = os.path.join(temp_directory, f"{start_page+1}.pdf")
-        with open(output_filename, "wb") as output_file:
-            writer.write(output_file)
+
+
+        print(f"***Output filename: {output_filename}")
+
+        with open('files/temp/test.txt', "w") as test_file:
+            test_file.write("This is a test file to check write permissions.")
+        print(f"Test file successfully written to: 'test.txt'")
+
+        # Check if the folder exists
+        if os.path.exists(temp_directory):
+            # Check if the script has write permission
+            if os.access(temp_directory, os.W_OK):
+                print(f"Write permission is granted for: {temp_directory}")
+            else:
+                print(f"Write permission is NOT granted for: {temp_directory}")
+        else:
+            print(f"The folder does not exist: {temp_directory}")
+
+        try:
+            with open(output_filename, "wb") as output_file:
+                writer.write(output_file)
+        except Exception as e:
+            print(f"Failed to save PDF segment {start_page+1}-{end_page}: {e}")
 
     print(f"PDF split into segments of {pages_per_split} pages in '{temp_directory}'")
 
@@ -69,7 +91,7 @@ def sherpa_chunk_pdfs(metadata):
 def sherpa_chunk_pdf(file, metadata, last_page_number):
     print(f"splitting and embedding file: {file}")
     print()
-    llmsherpa_api_url = "http://localhost:5010/api/parseDocument?renderFormat=all"
+    llmsherpa_api_url = "http://127.0.0.1:5010//api/parseDocument?renderFormat=all"
     pdf_reader = LayoutPDFReader(llmsherpa_api_url)
     print(f"Sending {file} to API")
     try: 

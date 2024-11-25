@@ -1,20 +1,54 @@
-# Data analysis for local plans
+# Local Plans Geospatial RAG prototype
+
+View this code running: https://localplans-ai-map-61938e5fe7bf.herokuapp.com
+
+This project explores using AI to process and combine policy documents that refer to specific locations (locations, buildings, parks, etc). The goal is to decompose a corpus of policy documents into the locations they are talking about, then recombine what each policy document says about a locattion into a summaries per location of all the policies that apply.
+
+It uses planning policy in England as an example, a topic where its easy to find lots of publicly available policy documents.
+
+Planning in England is guided by the The National Planning Policy Framework - the national guide to built environment policy.
+
+Local PLans are the key document that guides built environment policy in Local Authorities. Local Plans follow the guidances in the NPPF.
+
+In turn, Neighbourhood Plans are informed by Local Plans, and are for smaller areas within Local Authorities.
+
+This prototype investigates building a RAG that has features to support:
+
+- Hierarchical sets of policy documents (NPPF->Local Plans->Neighbourhood Plans)
+- Documents with geospatial inforation - policys about locations and areas.
+
+# Structure
+
+- This repo is the data processing pipeline
+- Frontend: https://github.com/jimmytidey/geospatial-policy-rag-frontend
+- API: https://github.com/jimmytidey/geospatial-policy-rag-api
+
+## DB Architecture
+
+There are four important tables:
+
+- langchain_pg_embedding - which contains embeddings, and topic lables and geo-labels
+- geo_boundaries - which has geographic boundaries for each document
+- text_chunks - which is my nicer to query than langchain_pg_embedding, but contains the same information
+- locations - whcih is a list of every geolocated location, plus the text it was located from. A sinlge location may have multiple rows, if it is mentioned in multiple places
+
+## Steps of the pipeline
+
+add the pdfs
+run the topic coding
+run the geocoding
+run the migration to text_chunks
+add any geoboundaries for the documents
 
 ## Running Locally
 
-`python -m venv venv`
+`python -m venv venv` - set the virtual environment up
 
-`pip install -r requirements.txt`
+`pip install -r requirements.txt` - install pip packages
 
-`python app.py` will run the Flask server locally
+`python app.py` - will run the Flask server locally
 
 When chunking, two algorithms are used for completeness.
-
-To see the last chunked PDF, as chunked by Llama Sherpa:
-http://127.0.0.1:5000/sherpa/
-
-To see the last chunked PDF, as chunked by PyMuPDF:
-http://127.0.0.1:5000/pymupdf/
 
 ## Setting up the postgres DB
 
@@ -24,6 +58,18 @@ DROP COLUMN embedding;
 
 ALTER TABLE langchain_pg_embedding
 ADD COLUMN embedding VECTOR(1536);
+
+# Installing Llama Sherpa local server
+
+This parses the documents
+
+Download docker image: ghcr.io/nlmatics/nlm-ingestor:latest
+
+docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor:latest
+
+# Deploying
+
+This is really intended to run locally
 
 # Making Llama Sherpa work externally (no longer works I think)
 
@@ -39,33 +85,3 @@ else:
 ssl.\_create_default_https_context = \_create_unverified_https_context
 
 nltk.download('punkt')
-
-# Installing Llama Sherpa local server
-
-Download docker image: ghcr.io/nlmatics/nlm-ingestor:latest
-
-docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor
-
-# Deploying
-
-Set heroku env variables from env file
-
-# Google API auth
-
-Steps to Set ADC on Heroku
-
-Service Account Key:
-
-Create a service account in your Google Cloud project.
-Download a JSON key file for this service account.
-Heroku Configuration:
-
-Open your Heroku app's dashboard.
-Navigate to "Settings" and then "Config Vars".
-Add the following config vars:
-GOOGLE_CREDENTIALS: Paste the entire contents of the JSON key file here.
-GOOGLE_APPLICATION_CREDENTIALS: Set this to /app/google-credentials.json.
-Profile Script:
-
-Create a file named .profile in the root directory of your project.
-Add this line to the file:

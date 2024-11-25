@@ -15,34 +15,28 @@ def topic_labels_load(record_id, labels, label_type):
 
     pg=Postgres()
     
-    try:
-        with pg.conn.cursor() as cursor:
-            # Convert the Python list to a JSON array string
-            labels_json = json.dumps(labels)
-            
-            
-            # Update the cmetadata JSON field by creating the 'labels' key or appending to it if it already exists
-            
-            json_path = '{' + label_type + '}'
+    try:       
+        # Convert the Python list to a JSON array string
+        labels_json = json.dumps(labels)
+        
+        # Update the cmetadata JSON field by creating the 'labels' key or appending to it if it already exists
+        
+        json_path = '{' + label_type + '}'
 
-            query = """
-                UPDATE langchain_pg_embedding
-                SET cmetadata = jsonb_set(
-                    cmetadata,
-                    %s,
-                    (COALESCE(cmetadata->%s, '[]'::jsonb) || %s::jsonb),
-                    true
-                )
-                WHERE id = %s;
-            """
+        query = """
+            UPDATE langchain_pg_embedding
+            SET cmetadata = jsonb_set(
+                cmetadata,
+                %s,
+                (COALESCE(cmetadata->%s, '[]'::jsonb) || %s::jsonb),
+                true
+            )
+            WHERE id = %s;
+        """
 
-            # Executing the query, dynamically passing the JSON path as well
-            cursor.execute(query, (json_path, label_type, labels_json, record_id))
-            
-            # Commit the transaction
-            pg.conn.commit()
-            
-            print(f"Labels {labels} with {label_type} added to record with ID {record_id}.")
+        # Executing the query, dynamically passing the JSON path as well
+        pg.insert(query, (json_path, label_type, labels_json, record_id))
+        print(f"Labels {labels} with {label_type} added to record with ID {record_id}.")
 
     except psycopg2.Error as e:
         print(f"Error updating labels: {e}")

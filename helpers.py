@@ -37,6 +37,21 @@ def chunk_pdf(url, file_name, metadata):
 
     compare_chunkings(sherpa_chunks, pymupdf_chunks)
 
+def chunk_pdf_from_file(file_name, metadata):
+    # pymupdf chunking
+    pymupdf_chunks = pymupdf_chunk_pdf(file_name, metadata)
+    save_chunks_to_csv(pymupdf_chunks, "pymupdf")
+    chunks_csv_to_db("pymupdf")
+
+    # sherpa chunking (by section)
+    split_pdf(file_name, 10)
+    sherpa_chunks = sherpa_chunk_pdfs(metadata)
+    sherpa_chunks = sherpa_fill_in_sections(sherpa_chunks)
+    sherpa_chunks = sherpa_coalesce_sections(sherpa_chunks)
+    save_chunks_to_csv(sherpa_chunks, "sherpa")
+    chunks_csv_to_db("sherpa")
+
+    compare_chunkings(sherpa_chunks, pymupdf_chunks)
 
 
 def download_pdf(url, save_name):

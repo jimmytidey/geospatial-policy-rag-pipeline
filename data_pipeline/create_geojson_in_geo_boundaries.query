@@ -1,0 +1,10 @@
+UPDATE geo_boundaries
+SET geojson_feature = jsonb_build_object(
+    'type', 'Feature',
+    'geometry', ST_AsGeoJSON(geom)::jsonb,
+    'properties', jsonb_build_object(
+        'name', text_chunks.document_title  -- Use document_title as the name property
+    )
+)
+FROM text_chunks
+WHERE geo_boundaries.id = text_chunks.document_geo_boundary_id;
