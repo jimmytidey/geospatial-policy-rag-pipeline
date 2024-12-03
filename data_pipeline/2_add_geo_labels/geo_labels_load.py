@@ -4,10 +4,13 @@ from postgres import Postgres
 import json
 
 def geo_labels_load(chunk_id, location_records):
+    
     pg = Postgres()
 
+    conn = pg.create_conn()
+
     try:
-        with pg.conn.cursor() as cursor:
+        with conn.cursor() as cursor:
             # Begin transaction
             cursor.execute("BEGIN;")
             
@@ -37,8 +40,8 @@ def geo_labels_load(chunk_id, location_records):
                 
                 # Insert into 'locations' table
                 locations_query = """
-                    INSERT INTO locations (lat, lng, formatted_address, location_name, chunk_id)
-                    VALUES (%s, %s, %s, %s, %s)
+                    INSERT INTO locations (geom, formatted_address, location_name, chunk_id)
+                    VALUES (ST_MakePoint(%s, %s), %s, %s, %s);
                 """
                 
                 cursor.execute(locations_query, (lat, lng, formatted_address, place_name, chunk_id))
@@ -61,8 +64,8 @@ def geo_labels_load(chunk_id, location_records):
 
     except Exception as e:
         # Rollback the transaction in case of an error
-        pg.conn.rollback()
+        conn.rollback()
         print(f"Transaction failed, rolled back changes. Error: {e}")
 
     finally:
-        pg.conn.commit()  # Ensure the connection is committed or rolled back properly
+        conn.commit()  # Ensure the connection is committed or rolled back properly

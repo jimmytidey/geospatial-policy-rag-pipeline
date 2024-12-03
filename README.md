@@ -34,11 +34,12 @@ There are four important tables:
 
 ## Steps of the pipeline
 
-add the pdfs
-run the topic coding
-run the geocoding
-run the migration to text_chunks
-add any geoboundaries for the documents
+- add the pdfs (add_pdfs.ipynb), which adds to the document details to the documents table, and adds chunks to the langchain_pg_embedding table
+- add a geo_boundary if required
+- run the topic coding (1_add_topic_lables/topic_labels_run.ipynb)
+- run the geocoding (2_add_geo_lables/geo_lables_run.ipynb)
+- run the migration to text_chunks
+-
 
 ## Running Locally
 
@@ -61,7 +62,7 @@ ADD COLUMN embedding VECTOR(1536);
 
 # Installing Llama Sherpa local server
 
-This parses the documents
+This parses the documents. You must have the docker app running.
 
 Download docker image: ghcr.io/nlmatics/nlm-ingestor:latest
 

@@ -14,6 +14,10 @@ class Postgres:
             dsn=DATABASE_URL  # Pass the URL as the DSN (Data Source Name)
         )            
 
+    def create_conn(self):
+        conn = self.db_pool.getconn()
+        return conn
+
     def insert(self, query, params=None):
         try:
             conn = self.db_pool.getconn()
@@ -29,6 +33,7 @@ class Postgres:
 
         except psycopg2.Error as e:
             print("Error:", e)
+            raise e
 
     def query(self, query, params=None):
         try:
@@ -46,3 +51,4 @@ class Postgres:
 
         except psycopg2.Error as e:
             print("Error:", e)
+            raise e

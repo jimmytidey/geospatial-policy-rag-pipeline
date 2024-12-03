@@ -4,10 +4,10 @@ from PyPDF2 import PdfReader, PdfWriter
 
 
 
-def split_pdf(file_name, pages_per_split=400):
+def split_pdf(file_path, pages_per_split=400):
     
     temp_directory =  os.path.join("files", "temp")
-    file_path = os.path.join("files", file_name)
+
 
     # Ensure the output directory exists
     if not os.path.exists(temp_directory):
@@ -47,10 +47,6 @@ def split_pdf(file_name, pages_per_split=400):
 
 
         print(f"***Output filename: {output_filename}")
-
-        with open('files/temp/test.txt', "w") as test_file:
-            test_file.write("This is a test file to check write permissions.")
-        print(f"Test file successfully written to: 'test.txt'")
 
         # Check if the folder exists
         if os.path.exists(temp_directory):
@@ -98,7 +94,7 @@ def sherpa_chunk_pdf(file, metadata, last_page_number):
         pdf = pdf_reader.read_pdf(file)
         print(f"{file} analysed successfully")
     except: 
-        print("PDF ANALYSIS FAILED - bad pdf?")
+        print("PDF ANALYSIS FAILED - is the chunking server running? Is this a valid PDF?")
         return []
     
     output_chunks = []
