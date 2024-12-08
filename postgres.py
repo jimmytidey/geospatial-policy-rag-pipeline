@@ -33,7 +33,7 @@ class Postgres:
 
         except psycopg2.Error as e:
             print("Error:", e)
-            raise e
+            
 
     def query(self, query, params=None):
         try:
@@ -51,4 +51,4 @@ class Postgres:
 
         except psycopg2.Error as e:
             print("Error:", e)
-            raise e
+            

@@ -1,3 +1,4 @@
+'''
 import os,uuid,requests,hashlib
 import pandas as pd
 from dotenv import load_dotenv
@@ -53,12 +54,12 @@ def chunk_pdf(url, metadata):
     chunks_csv_to_db("pymupdf")
 
     # sherpa chunking (by section)
-    # split_pdf(file_path, 10)
-    # sherpa_chunks = sherpa_chunk_pdfs(metadata)
-    # sherpa_chunks = sherpa_fill_in_sections(sherpa_chunks)
-    # sherpa_chunks = sherpa_coalesce_sections(sherpa_chunks)
-    # save_chunks_to_csv(sherpa_chunks, "sherpa")
-    #chunks_csv_to_db("sherpa")
+    split_pdf(file_path, 10)
+    sherpa_chunks = sherpa_chunk_pdfs(metadata)
+    sherpa_chunks = sherpa_fill_in_sections(sherpa_chunks)
+    sherpa_chunks = sherpa_coalesce_sections(sherpa_chunks)
+    save_chunks_to_csv(sherpa_chunks, "sherpa")
+    chunks_csv_to_db("sherpa")
 
     # compare_chunkings(sherpa_chunks, pymupdf_chunks)
 
@@ -252,3 +253,4 @@ def search(search_term, top_k, filter=None):
     results = vectorstore.similarity_search_with_score(search_term, k=top_k, filter=filter)
     
     return results
+'''
