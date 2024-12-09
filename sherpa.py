@@ -1,3 +1,4 @@
+'''
 import os,re, glob, uuid
 from llmsherpa.readers import LayoutPDFReader
 from PyPDF2 import PdfReader, PdfWriter
@@ -170,3 +171,4 @@ def list_files(path):
     files = glob.glob(os.path.join(path, "*.pdf"))
     sorted_files = sorted(files, key=lambda x: int(x.split('/')[-1].split('.')[0]))
     return sorted(sorted_files) 
+'''
