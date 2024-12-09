@@ -6,23 +6,23 @@ from postgres import Postgres
 def topic_labels_extract(number_of_records):
     pg = Postgres()
 
-    count_records_without_openai_labels()
+    # count_records_without_openai_labels()
 
     query = """
         SELECT 
-            lce.id, 
-            lce.cmetadata->>'neighbourhood' AS neighbourhood, 
-            lce.cmetadata->>'block_idx' AS block_idx, 
-            lce.cmetadata->>'sections' AS sections, 
-            lce.cmetadata->>'text' AS text
+            etc.chunk_id,
+			etc.sections,
+            etc.text,
+            d.lpa,
+            d.neighbourhood
         FROM 
-            langchain_pg_embedding lce
+            extracted_chunks etc
+        JOIN 
+            documents d ON etc.document_id = d.document_id
         WHERE 
-            NOT (lce.cmetadata ? 'openai_labels')  -- Exclude records with 'openai_labels' in cmetadata
-            
-            AND lce.cmetadata->>'chunker' = 'sherpa'
-        ORDER BY 
-            RANDOM()
+            etc.chunker = 'sherpa'
+            AND (etc.openai_topic_labels IS NULL OR etc.openai_topic_labels = '[]')	
+        order by page, block_idx
         LIMIT %s;
     """
     
@@ -37,14 +37,18 @@ def count_records_without_openai_labels():
     try:
         query = """
             SELECT COUNT(*)
-            FROM langchain_pg_embedding
-            WHERE NOT (cmetadata ? 'openai_labels')
-            AND cmetadata->>'chunker' = 'sherpa';
+        FROM 
+            extracted_chunks etc
+        JOIN 
+            documents d ON etc.document_id = d.document_id
+        WHERE 
+            etc.chunker = 'sherpa'
+            AND (etc.openai_topic_labels IS NULL OR etc.openai_topic_labels = '[]');
         """
         result = pg.query(query)
         count = result[0][0]  # Fetch the count
         
-        print(f"Number of records without 'openai_labels': {count}")
+        print(f"Number of records without 'openai_topic_labels': {count}")
         return count
     
     except Exception as e:

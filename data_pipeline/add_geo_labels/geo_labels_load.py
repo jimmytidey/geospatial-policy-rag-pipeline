@@ -1,9 +1,33 @@
-import os,sys
+import os,sys, psycopg2
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from postgres import Postgres 
 import json
 
-def geo_labels_load(chunk_id, location_records):
+
+def geo_labels_load(geo_labels, chunk_id):
+
+    pg=Postgres()
+    
+    try:       
+        # Convert the Python list to a JSON array string
+        labels_json = json.dumps(geo_labels)
+        
+        # Update the cmetadata JSON field by creating the 'labels' key or appending to it if it already exists
+        update_query = """
+        UPDATE extracted_chunks
+        SET openai_geo_labels = %s
+        WHERE chunk_id = %s;
+        """
+        # Executing the query, dynamically passing the JSON path as well
+        pg.insert(update_query, (labels_json, chunk_id))
+        print(f"Labels {geo_labels} added to record with ID {chunk_id}.")
+
+    except psycopg2.Error as e:
+        print(f"Error updating labels: {e}")
+        pg.conn.rollback()    
+
+
+def geo_labels_load_old(chunk_id, location_records):
     
     pg = Postgres()
 

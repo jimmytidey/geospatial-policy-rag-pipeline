@@ -4,7 +4,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from postgres import Postgres 
 
 
-def topic_labels_load(record_id, labels, label_type):
+def topic_labels_load(chunk_id, labels, ):
     """
     Adds an array of labels to the 'labels' key in the cmetadata JSON column for a given record.
     If the 'labels' key does not exist, it will create it and add the new labels.
@@ -20,23 +20,15 @@ def topic_labels_load(record_id, labels, label_type):
         labels_json = json.dumps(labels)
         
         # Update the cmetadata JSON field by creating the 'labels' key or appending to it if it already exists
-        
-        json_path = '{' + label_type + '}'
-
-        query = """
-            UPDATE langchain_pg_embedding
-            SET cmetadata = jsonb_set(
-                cmetadata,
-                %s,
-                (COALESCE(cmetadata->%s, '[]'::jsonb) || %s::jsonb),
-                true
-            )
-            WHERE id = %s;
+     
+        update_query = """
+        UPDATE extracted_chunks
+        SET openai_topic_labels = %s
+        WHERE chunk_id = %s;
         """
-
         # Executing the query, dynamically passing the JSON path as well
-        pg.insert(query, (json_path, label_type, labels_json, record_id))
-        print(f"Labels {labels} with {label_type} added to record with ID {record_id}.")
+        pg.insert(update_query, (labels_json, chunk_id))
+        print(f"Labels {labels} added to record with ID {chunk_id}.")
 
     except psycopg2.Error as e:
         print(f"Error updating labels: {e}")
