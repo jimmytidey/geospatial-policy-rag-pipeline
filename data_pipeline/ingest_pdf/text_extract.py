@@ -3,6 +3,7 @@ from llmsherpa.readers import LayoutPDFReader
 from PyPDF2 import PdfReader, PdfWriter
 
 def validate_metadata(metadata: dict) -> dict:
+
     # Validate `category`
     if not isinstance(metadata.get("category"), str) or not metadata["category"].strip():
         raise ValueError("`category` must be a non-empty string.")
@@ -21,21 +22,27 @@ def validate_metadata(metadata: dict) -> dict:
         if not (isinstance(metadata["end_year"], int) or metadata["end_year"] == ""):
             raise ValueError("`end_year` must be an integer or an empty string.")
     
-    # Validate `lat` and `lng`
-    lat = metadata.get("lat")
-    lng = metadata.get("lng")
-
-    if lat is not None or lng is not None:
-        # Both must be empty strings or both must be floats/integers
-        if (lat == "" and lng == ""):
-            pass  # Valid if both are empty strings
-        elif (lat == "" or lng == ""):
-            raise ValueError("Both `lat` and `lng` must be empty strings or valid floats/integers.")
-        elif not isinstance(lat, (float, int)):
+    # Validate `is_geocodeable`
+    is_geocodeable = metadata.get("is_geocodeable")
+    if is_geocodeable not in [True, False]:
+        raise ValueError("`is_geocodeable` must be either True or False.")
+    
+    if is_geocodeable:
+        # If is_geocodeable is True, validate `lat`, `lng`, and `geocode_string_wide`
+        lat = metadata.get("lat")
+        lng = metadata.get("lng")
+        geocode_string_wide = metadata.get("geocode_string_wide")
+        
+        if lat is None or lng is None or geocode_string_wide is None:
+            raise ValueError("If `is_geocodeable` is True, `lat`, `lng`, and `geocode_string_wide` must all be provided.")
+        
+        if not isinstance(lat, (float, int)):
             raise ValueError("`lat` must be a float or an integer.")
-        elif not isinstance(lng, (float, int)):
+        if not isinstance(lng, (float, int)):
             raise ValueError("`lng` must be a float or an integer.")
-
+        if not isinstance(geocode_string_wide, str) or not geocode_string_wide.strip():
+            raise ValueError("`geocode_string_wide` must be a non-empty string.")
+    
     return metadata
 
 

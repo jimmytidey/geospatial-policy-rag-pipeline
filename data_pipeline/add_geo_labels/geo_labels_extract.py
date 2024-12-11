@@ -19,6 +19,7 @@ def geo_labels_extract(number_of_records):
         WHERE 
             etc.chunker = 'sherpa'
             AND (etc.openai_geo_labels IS NULL OR etc.openai_geo_labels = '[]')	
+            AND d.is_geocodeable = True
         order by page, block_idx
         LIMIT %s;
     """
@@ -40,7 +41,8 @@ def count_records_without_openai_geo_labels():
             documents d ON etc.document_id = d.document_id
         WHERE 
             etc.chunker = 'sherpa'
-            AND (etc.openai_geo_labels IS NULL OR etc.openai_geo_labels = '[]');
+            AND (etc.openai_geo_labels IS NULL OR etc.openai_geo_labels = '[]')
+            AND d.is_geocodeable = True;
         """
         result = pg.query(query)
         count = result[0][0]  # Fetch the count
