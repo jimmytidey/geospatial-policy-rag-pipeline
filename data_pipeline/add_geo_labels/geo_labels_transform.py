@@ -37,24 +37,3 @@ def get_location_names(title, text):
     )
     return completion.choices[0].message.content
 
-def geocode(search_string, place_name):
-
-    locations = [] 
-    for location_name in location_names.split(","):
-        location_name_clean = location_name.strip().title()
-        #locations.append(geocode(location_name_clean, 'leeds'))
-
-  
-    gmaps = googlemaps.Client(key=os.environ["GOOGLEMAPS_API_KEY"])
-    geocode_result = gmaps.geocode(search_string + ", Leeds, UK")
-
-    if geocode_result:
-        location = geocode_result[0]['geometry']['location']
-        lat = location['lat']
-        lng = location['lng']
-        formatted_address = geocode_result[0]['formatted_address']
-        
-        return {'location_name': search_string, 'lat': lat, 'lng': lng, 'formatted_address': formatted_address}
-    else:
-        print(f"Error geocoding {place_name}: No results found")
-        return False

@@ -8,11 +8,10 @@ def get_info():
     pg = Postgres()
     # Query to fetch documents without geo-boundaries
     documents_without_geo_boundaries_query = """
-    SELECT d.title, d.document_id
-    FROM documents d
-    LEFT JOIN document_geo_boundary dgb ON d.document_id = dgb.document_id
-    WHERE dgb.document_id IS NULL
-    ORDER BY d.title;
+    SELECT title, document_id
+    FROM documents
+    WHERE geo_boundary_id IS NULL
+    ORDER BY title;
     """
 
     # Query to fetch all geo-boundaries

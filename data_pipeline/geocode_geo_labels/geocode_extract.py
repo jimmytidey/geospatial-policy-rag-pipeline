@@ -2,6 +2,24 @@ import sys,os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from postgres import Postgres
 
+def count_chunks_for_geocoding():
+    pg = Postgres()
+
+    query = """
+        SELECT COUNT(*)
+        FROM extracted_chunks
+        JOIN documents ON extracted_chunks.document_id = documents.document_id
+        WHERE documents.is_geocodeable = TRUE
+        AND extracted_chunks.geocoded = FALSE
+        AND extracted_chunks.openai_geo_labels IS NOT NULL
+        AND extracted_chunks.openai_geo_labels <> '[]'
+        AND NOT extracted_chunks.openai_topic_labels::jsonb ? 'broken_fragment';
+    """
+    
+    # Execute the query, passing number_of_records as the limit
+    count = pg.query(query)
+
+    return count
 
 def extract_chunks_for_geocoding(number_of_records):
     pg = Postgres()
@@ -9,13 +27,14 @@ def extract_chunks_for_geocoding(number_of_records):
     query = """
         SELECT *
         FROM extracted_chunks
-        join documents on extracted_chunks.document_id = extracted_chunks.document_id
+        JOIN documents ON extracted_chunks.document_id = documents.document_id
+        JOIN geo_boundaries ON documents.geo_boundary_id = geo_boundaries.geo_boundary_id
         WHERE documents.is_geocodeable = TRUE
-        AND geocoded = FALSE
-        AND openai_geo_labels IS NOT NULL
-        AND openai_geo_labels <> '[]'
-
-        LIMIT 100;
+        AND extracted_chunks.geocoded = FALSE
+        AND extracted_chunks.openai_geo_labels IS NOT NULL
+        AND extracted_chunks.openai_geo_labels <> '[]'
+        AND NOT extracted_chunks.openai_topic_labels::jsonb ? 'broken_fragment'
+        LIMIT %s;
     """
     
     # Execute the query, passing number_of_records as the limit

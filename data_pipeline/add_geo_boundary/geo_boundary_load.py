@@ -7,25 +7,25 @@ def link_document_to_geo_boundary(document_id, geo_boundary_id):
     ensure_geo_boundary_tables_exist()
 
     """
-    Links a document to a geo_boundary in the document_geo_boundary table.
+    Links a document to a geo_boundary by updating the geo_boundary_id in the documents table.
 
     Args:
         document_id (str): The ID of the document.
         geo_boundary_id (int): The ID of the geo boundary.
     """
-    # SQL query to insert the link
-    insert_query = """
-    INSERT INTO document_geo_boundary (document_id, geo_boundary_id)
-    VALUES (%s, %s)
-    ON CONFLICT (document_id, geo_boundary_id) DO NOTHING;
+    # SQL query to update the geo_boundary_id in the documents table
+    update_query = """
+    UPDATE documents
+    SET geo_boundary_id = %s
+    WHERE document_id = %s;
     """
     
     # Parameters for the query
-    values = (document_id, geo_boundary_id)
+    values = (geo_boundary_id, document_id)
     
     try:
         # Execute the query
-        pg.insert(insert_query, values)
+        pg.insert(update_query, values)  # Assuming `pg.update` is the method to execute UPDATE queries
         print(f"Successfully linked document_id: {document_id} to geo_boundary_id: {geo_boundary_id}.")
     except Exception as e:
         print(f"Error linking document_id: {document_id} to geo_boundary_id: {geo_boundary_id}: {e}")

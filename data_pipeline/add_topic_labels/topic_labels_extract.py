@@ -31,7 +31,7 @@ def topic_labels_extract(number_of_records):
     return records
 
 
-def count_records_without_openai_labels():
+def count_records_without_openai_topic_labels():
     pg = Postgres() 
     
     try:

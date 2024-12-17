@@ -151,7 +151,8 @@ def ensure_documents_table_setup():
         council_type TEXT,
         experiment TEXT,
         notes TEXT,
-        is_geocodeable BOOLEAN, 
+        geo_boundary_id INT REFERENCES geo_boundaries(geo_boundary_id) ON DELETE SET NULL
+        is_geocodeable BOOLEAN,
         geocode_stirng_wide TEXT,
         geocode_string_narrow TEXT,
         geom_centre_point GEOGRAPHY(Point, 4326)
