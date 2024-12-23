@@ -51,4 +51,7 @@ class Postgres:
 
         except psycopg2.Error as e:
             print("Error:", e)
-            
+    
+    def return_connection(self):
+        conn = self.db_pool.getconn()
+        return conn

@@ -11,7 +11,7 @@ def topic_labels_transform(title, text):
     Text: {text}
 
     Labels 
-    "broken_fragment" - if the text appears incoherent or impossible to understand 
+    "broken_fragment" - if the text appears incoherent or impossible to understand, or if it is just a number of series of numbers with no text, or just a fragment of a sentence
 
     "bad_start" - if the text appears to start mid-sentence 
 
@@ -78,8 +78,6 @@ def topic_labels_transform(title, text):
     'views' - if it is about views, vistas, or the visual impact of development
 
     “community_facilities” - if it is about village halls, medical centers, community centers etc.
-
-    "no_label" - if it does not fit any category 
 
     '''
 

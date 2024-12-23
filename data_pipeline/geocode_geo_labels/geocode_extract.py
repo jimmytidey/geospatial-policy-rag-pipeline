@@ -19,13 +19,23 @@ def count_chunks_for_geocoding():
     # Execute the query, passing number_of_records as the limit
     count = pg.query(query)
 
-    return count
+    return count[0][0]
 
 def extract_chunks_for_geocoding(number_of_records):
     pg = Postgres()
 
     query = """
-        SELECT *
+        SELECT 
+        	chunk_id, 
+			openai_geo_labels,
+			openai_topic_labels,
+			geocode_string_wide,
+			geocode_string_narrow,
+			title,
+            text,
+            sections,
+			geom,
+			geom_centre_point
         FROM extracted_chunks
         JOIN documents ON extracted_chunks.document_id = documents.document_id
         JOIN geo_boundaries ON documents.geo_boundary_id = geo_boundaries.geo_boundary_id
