@@ -12,8 +12,7 @@ def geo_boundary_extract_from_url(url):
     geojson_data = response.json()
     geometry_json = json.dumps(geojson_data)  # Convert the dictionary to a JSON string
     return geometry_json
-
-
+    
 def geo_boundary_extract_from_file(file_path):
     pg = Postgres()  # Create a new database connection
     # Read the GeoJSON file

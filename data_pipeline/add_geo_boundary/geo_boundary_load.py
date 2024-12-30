@@ -44,7 +44,7 @@ def add_geo_boundary(document_id, geo_boundary_name, geometry_json):
     
     insert_query = """
     INSERT INTO geo_boundaries (name, geom)
-    VALUES (%s, ST_GeomFromGeoJSON(%s))
+    VALUES (%s, ST_GeomFromGeoJSON(%s, 4324))
     """
     pg.insert(insert_query, (geo_boundary_name, geometry_json))
     result = pg.query("SELECT * FROM geo_boundaries WHERE name = %s", (geo_boundary_name,))

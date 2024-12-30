@@ -19,20 +19,35 @@ class Postgres:
         return conn
 
     def insert(self, query, params=None):
+       
         try:
+            # Get a connection from the pool
             conn = self.db_pool.getconn()
             cursor = conn.cursor()
+            
+            # Execute the query
             if params is None:
                 cursor.execute(query)
             else:
                 cursor.execute(query, params)
             
+            # Commit the transaction
             conn.commit()
-            cursor.close()
-            self.db_pool.putconn(conn) 
-
+        
         except psycopg2.Error as e:
-            print("Error:", e)
+            # Print detailed error message
+            print(f"Database error: {e.pgerror}")
+            print(f"SQL state: {e.pgcode}")
+            print(f"Query: {query}")
+            if params:
+                print(f"Parameters: {params}")
+        
+        finally:
+            # Ensure the cursor and connection are closed or returned to the pool
+            if cursor:
+                cursor.close()
+            if conn:
+                self.db_pool.putconn(conn)
             
 
     def query(self, query, params=None):

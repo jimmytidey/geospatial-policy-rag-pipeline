@@ -7,79 +7,111 @@ import binascii
 from math import radians, cos, sin, sqrt, atan2
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def geocode_chunk(row):
-    print("--------------------------------")
-    print("geocoding row from document: " + row['title'])
-    print("Sections: " + row['sections'][:100])
-    print("Text: " + row['text'][:100])
-    print('Openai topic labels: ' + str(row.get('openai_topic_labels', 'No openai geo labels')))
-    print('Wide string: ' +  str(row.get('geocode_string_wide', 'No wide geocode string')))
-    print('Narrow string:' +  str(row.get('geocode_string_narrow', 'No narrow geocode string')))
+def geocode_row(row):
 
-    results = []
-    for label in row['openai_geo_labels']:
-        print('\n')
-        print("Geocoding label: " + label)
-        best_location = geolocate_label(label, row)
-        best_location['chunk_id'] = row['chunk_id']
-        best_location['openai_geo_label'] = label
-        print("Best location: ")
-        pprint.pprint(best_location)
-        results.append(best_location)
+    # rows only have one label because of the cross join in the extract_labels_for_geocoding function
     
-    return results
-
-def geolocate_label(label, row):
     geom = get_geometry(row)
 
     if not geom: 
-        print("No bounding polygon or center point found, skipping geocode")
+        print("No bounding polygon or center point found, skipping geocode. This message will come up every run until the geometry is added to the table, or the document is marked at non-geocodable")
         return None
 
     if not 'geocode_string_narrow' in row and not 'geocode_string_wide' in row:
-        print("No geocode strings found, skipping geocode")
-        return None
-
-    if row.get('geocode_string_wide') and row.get('geocode_string_narrow'):
-        wide_and_narrow_string = label +", "+row['geocode_string_narrow']+", "+row['geocode_string_wide'] +  ", UK" 
-        wide_and_narrow_candidates = geocode_string(wide_and_narrow_string, geom)
-    else:
-        wide_and_narrow_candidates = []
-
-    if not row.get('geocode_string_wide') and row.get('geocode_string_narrow'):
-        only_narrow_string = label +", "+row['geocode_string_narrow'] +  ", UK" 
-        only_narrow_candidates = geocode_string(only_narrow_string, geom)
-    else:
-        only_narrow_candidates = []
-
-    if row.get('geocode_string_wide') and not row.get('geocode_string_narrow'):
-        wide_string = label +", "+row['geocode_string_wide'] +  ", UK" 
-        wide_candidates = geocode_string(wide_string, geom)
-    else:
-        wide_candidates = []
-
-    candidates = (wide_and_narrow_candidates or []) + (only_narrow_candidates or []) + (wide_candidates or [])
+        print("No bounding polygon or center point found, skipping geocode. This message will come up every run until the geometry is added to the table, or the document is marked at non-geocodable")
+        return None    
     
-    print("number of candidates: " + str(len(candidates)))
-    pprint.pprint(candidates)
-    best_location = pick_best_location(candidates)
+    openai_geo_label = row['openai_geo_label']
+    wide_string = row.get('geocode_string_wide', False)
+    narrow_string = row.get('geocode_string_narrow', False)
 
-    return best_location
-
-
-def geocode_string(string, geom):
-    gmaps = googlemaps.Client(key=os.getenv('GOOGLEMAPS_API_KEY'))
+    print("--------------------------------")
+    print("geocoding row from document: " + row['title'])
+    print("Sections: " + row['sections'][:100])
+    print("Text: " + row['text'][:300])
+    print('Openai topic labels: ' + str(row.get('openai_topic_labels', 'No openai geo labels')))
+    print('Wide string: ' +  str(wide_string))
+    print('Narrow string: ' +  str(narrow_string))
+    print('\n')
+    print("Geocoding label: " + openai_geo_label)    
     
-    try:
-        # Attempt to geocode the string
-        geocode_results = gmaps.geocode(string)
+
+    if wide_string and narrow_string:
+        wide_and_narrow_string = openai_geo_label +", "+narrow_string+", " + wide_string +  ", UK" 
+        wide_and_narrow_geocoded_results = geocode_string(wide_and_narrow_string, geom, row)
+        for d in wide_and_narrow_geocoded_results: d['geocode_strategy'] = 'wide_and_narrow'
+    else:
+        wide_and_narrow_geocoded_results = []
+
+    if narrow_string:
+        only_narrow_string = openai_geo_label +", "+narrow_string +  ", UK" 
+        only_narrow_geocoded_results = geocode_string(only_narrow_string, geom, row)
+        for d in only_narrow_geocoded_results: d['geocode_strategy'] = 'narrow'
         
-        if not geocode_results:
-            return None
+    else:
+        only_narrow_geocoded_results = []
+
+    if wide_string:
+        wide_string = openai_geo_label +", "+wide_string +  ", UK" 
+        wide_geocoded_results = geocode_string(wide_string, geom, row)
+        for d in wide_geocoded_results: d['geocode_strategy'] = 'wide'
+    else:
+        wide_geocoded_results = []
+
+    geocoded_results = (wide_and_narrow_geocoded_results or []) + (only_narrow_geocoded_results or []) + (wide_geocoded_results or [])
+    
+    if len(geocoded_results)==0:
+        print("*** Geocoding failed ***")
+        null_result = [{  
+                'geocode_success': False,
+                'chunk_id': row['chunk_id'],
+                'openai_geo_label': row['openai_geo_label'],
+                'formatted_address': None,
+                'api_result_rank': None,
+                'google_place_id': None,
+                'geocode_string': None,
+                'geom': None,
+                'distance_from_document_geom': None,
+                'bounding_box': None,
+                'bounding_box_area': None,
+                'document_geom_type': None,
+                'types':None,
+                'raw_result': None,
+            }]         
+        
+
+        print("returning null result")
+        return null_result
+    
+    
+    print("number of results: " + str(len(geocoded_results)))
+    
+    ranked_geocoded_results = rank_geocoded_results(geocoded_results, wide_string, narrow_string)[:1]
+    
+    # remove raw_result from each candidate for printing to screen to make it more readable
+    ranked_geocoded_results_without_raw = [
+        {k: v for k, v in ranked_geocoded_result.items() if k != 'raw_result'}
+        for ranked_geocoded_result in ranked_geocoded_results
+    ]    
+
+    print("Geocoding: ")
+    pprint.pprint(ranked_geocoded_results_without_raw)
+
+    return ranked_geocoded_results
+
+
+def geocode_string(string, geom, row):
+
+    try:
+        
+        gmaps = googlemaps.Client(key=os.getenv('GOOGLEMAPS_API_KEY'))
+        geocode_results = gmaps.geocode(string)
         
         formatted_results = []
 
-        for result in geocode_results:
+        
+        
+        for index, result in enumerate(geocode_results, start=1):
             point = Point(result['geometry']['location']['lng'], result['geometry']['location']['lat'])
             distance_from_document_geom = wgs84_distance_to_kilometers(point, geom)
             bounding_box =  extract_bounding_box_polygon(result['geometry'])
@@ -91,7 +123,12 @@ def geocode_string(string, geom):
                 document_geom_type = "Polygon"
 
             formatted_results.append({
+                'geocode_success': True,
+                'chunk_id': row['chunk_id'],
+                'openai_geo_label': row['openai_geo_label'],
                 'formatted_address': result['formatted_address'],
+                'api_result_rank': index,
+                'google_place_id': result['place_id'],
                 'geocode_string': string,
                 'geom': point,
                 'distance_from_document_geom': round(distance_from_document_geom, 3),
@@ -108,8 +145,46 @@ def geocode_string(string, geom):
         print(f"Error geocoding string '{string}': {e}")
         return None
 
-def pick_best_location(candidates):
-    return min(candidates, key=lambda x: x['distance_from_document_geom'])
+def dedupe_by_google_place_id(candidates):
+    seen_ids = set()
+    deduplicated_list = []
+    
+    for candidate in candidates:
+        google_place_id = candidate.get('google_place_id')
+        if google_place_id not in seen_ids:
+            seen_ids.add(google_place_id)
+            deduplicated_list.append(candidate)
+    
+    return deduplicated_list        
+
+def rank_geocoded_results(geocoded_results, wide_string, narrow_string):
+
+    gmaps = googlemaps.Client(key=os.getenv('GOOGLEMAPS_API_KEY'))
+    exclude_results = gmaps.geocode(f"{narrow_string}, {wide_string}, UK")
+    exclude_place_id = exclude_results[0]['place_id']
+
+    pprint.pprint(geocoded_results)
+
+    print("exlcude place id: " + exclude_place_id)
+
+    for result in geocoded_results[:]:
+        if result['google_place_id'] == exclude_place_id:
+            print("Removing result with place id: " + result['google_place_id'])
+            geocoded_results.remove(result)
+    
+    # this to do for later... 
+
+    # return top wide_and_narrow_geocoded_result if there is a perfect string match 
+
+    # return wide_and_narrow_geocoded_results if there are multiple wide matches
+
+    # return wide_geocoded_results if there is only one wide match and its a better string match that wide_and_narrow_geocoded_result
+
+    # if all of the above fail, return the top ranked geocoded result for whole uk, if there is only one result 
+
+
+    return geocoded_results
+
 
 def get_geometry(row):
     geom = None
@@ -215,7 +290,8 @@ def extract_bounding_box_polygon(geometry_data, box_type='bounds'):
         
         # If bounding box doesn't exist, return None
         if not bounding_box:
-            raise ValueError(f"{box_type} not found in geometry data.")
+            print("*** Bounding box not found ***")
+            return None
         
         # Extract coordinates
         northeast = bounding_box['northeast']
@@ -236,6 +312,10 @@ def extract_bounding_box_polygon(geometry_data, box_type='bounds'):
         raise ValueError(f"Invalid geometry data format. Missing key: {e}")
 
 def get_area_of_bounding_box(bounding_box):
+
+    if not bounding_box:
+        return None
+    
     """
     Calculate the approximate area of a bounding box in square kilometers.
     Uses WGS84 distances to account for the Earth's curvature.
